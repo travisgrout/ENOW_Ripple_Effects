@@ -112,54 +112,44 @@ def details_page():
     # --- Employment Section ---
     st.markdown("---")
     st.header("Employment")
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown(f"<div style='font-size: 20px;'>Marine industries supported about <b>{var_4_formatted} million</b> U.S. jobs in 2023.</div>", unsafe_allow_html=True)
-    with col2:
-        create_treemap(
-            data_column='WageAndSalaryEmployment',
-            title='Employment by Impact Type'
-        )
+    # Text is now full-width
+    st.markdown(f"<div style='font-size: 20px; text-align: center;'>Marine industries supported about <b>{var_4_formatted} million</b> U.S. jobs in 2023.</div>", unsafe_allow_html=True)
+    # Treemap is now full-width, placed below the text
+    create_treemap(
+        data_column='WageAndSalaryEmployment',
+        title='Employment by Impact Type'
+    )
 
     # --- Wages and Salary Section ---
     st.markdown("---")
     st.header("Wages and Salary")
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown(f"""<div style='font-size: 20px;'>
-        Supported <b>{var_5_formatted} billion</b> in labor income, an average of about <b>{avg_wages_per_worker_formatted}</b> per worker.
-        </div>""", unsafe_allow_html=True)
-    with col2:
-        create_treemap(
-            data_column='Wages_and_Salary',
-            title='Wages and Salary by Impact Type'
-        )
+    st.markdown(f"""<div style='font-size: 20px; text-align: center;'>
+    Supported <b>{var_5_formatted} billion</b> in labor income, an average of about <b>{avg_wages_per_worker_formatted}</b> per worker.
+    </div>""", unsafe_allow_html=True)
+    create_treemap(
+        data_column='Wages_and_Salary',
+        title='Wages and Salary by Impact Type'
+    )
 
     # --- Contribution to GDP Section ---
     st.markdown("---")
     st.header("Contribution to GDP")
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown(f"""<div style='font--size: 20px;'>
-        Supported <b>{var_6_formatted} billion</b> in GDP, an average of almost <b>{avg_gdp_per_worker_formatted}</b> per worker.
-        </div>""", unsafe_allow_html=True)
-    with col2:
-        create_treemap(
-            data_column='Value_Added',
-            title='Contribution to GDP by Impact Type'
-        )
+    st.markdown(f"""<div style='font-size: 20px; text-align: center;'>
+    Supported <b>{var_6_formatted} billion</b> in GDP, an average of almost <b>{avg_gdp_per_worker_formatted}</b> per worker.
+    </div>""", unsafe_allow_html=True)
+    create_treemap(
+        data_column='Value_Added',
+        title='Contribution to GDP by Impact Type'
+    )
 
     # --- Economic Output Section ---
     st.markdown("---")
     st.header("Economic Output")
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        st.markdown(f"<div style='font-size: 20px;'>Supported about <b>{var_7_formatted} billion</b> in total economic activity.</div>", unsafe_allow_html=True)
-    with col2:
-        create_treemap(
-            data_column='Output',
-            title='Economic Output by Impact Type'
-        )
+    st.markdown(f"<div style='font-size: 20px; text-align: center;'>Supported about <b>{var_7_formatted} billion</b> in total economic activity.</div>", unsafe_allow_html=True)
+    create_treemap(
+        data_column='Output',
+        title='Economic Output by Impact Type'
+    )
         
 # --- App Navigation Logic ---
 if st.session_state.page == 'main':
