@@ -1,0 +1,15 @@
+[theme]
+# The primary color for interactive elements
+primaryColor="#F63366"
+
+# The background color for the main content area
+backgroundColor="#003087"
+
+# The background color for the sidebar and other secondary areas
+secondaryBackgroundColor="#052359"
+
+# The color for all text
+textColor="#FFFFFF"
+
+# The font family for the app
+font="sans serif"
