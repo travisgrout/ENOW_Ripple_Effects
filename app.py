@@ -76,10 +76,10 @@ def create_treemap(data_column, title):
         # Custom formatting based on the data type
         if data_column == 'WageAndSalaryEmployment':
             # Format for jobs (e.g., "1,838,885 jobs")
-            formatted_value = f"{value:,.0f} jobs"
+            formatted_value = f"{value / 1_000_000:,.1f} million jobs"
         else:
-            # Format for billions of dollars (e.g., "$91B")
-            formatted_value = f"${value / 1_000_000_000:.0f}B"
+            # Format for billions of dollars (e.g., "$91 Billion")
+            formatted_value = f"${value / 1_000_000_000:.0f} Billion"
             
         labels.append(f"{impact_type}\n{formatted_value}")
 
