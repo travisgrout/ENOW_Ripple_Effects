@@ -1,125 +1,119 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-from pathlib import Path # <-- IMPORT THIS
+from pathlib import Path
 
-# Get the directory of the current script
-script_dir = Path(__file__).parent
+# --- Page Configuration and Styling ---
+# Sets the layout of the page and injects custom CSS for colors.
+st.set_page_config(layout="centered")
+
+def apply_custom_styling():
+    """Applies custom CSS to the Streamlit app."""
+    st.markdown("""
+        <style>
+            /* Targets the main block container */
+            .main .block-container {
+                background-color: #003087;
+            }
+            /* Targets the root of the app */
+            [data-testid="stAppViewContainer"] > .main {
+                background-color: #003087;
+            }
+            /* Targets all text elements */
+            .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp p, .stApp li, .stApp label, .stApp .st-bq, .stApp .st-cx, .stApp .st-dd, .stApp .st-bf, .stApp .st-c5 {
+                color: white;
+            }
+            /* Targets the sidebar */
+            [data-testid="stSidebar"] > div:first-child {
+                background-color: #052359; /* A slightly darker blue for the sidebar */
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+apply_custom_styling()
+
 
 # --- Data Loading and Processing ---
 try:
-    # Use a simple relative path. Streamlit will look for this file
-    # in the root of your GitHub repository.
+    # Using a simple relative path is the most reliable for Streamlit Cloud
     national_totals_df = pd.read_csv("ica_nationalTotals.csv")
 except FileNotFoundError:
     st.error("The file 'ica_nationalTotals.csv' was not found. Please make sure it is in the root of your GitHub repository.")
     st.stop()
 
-# --- Calculations for Variables ---
 
-# Isolate the 'Direct' impact data from the DataFrame
+# --- Calculations for Variables (same as before) ---
 direct_impact = national_totals_df[national_totals_df['ImpactType'] == 'Direct'].iloc[0]
-
-# Calculate the sum of all impact types for the totals
 total_impact = national_totals_df.sum(numeric_only=True)
 
-# <VAR_1>: Direct WageAndSalaryEmployment in millions
-var_1 = direct_impact['WageAndSalaryEmployment'] / 1_000_000
-var_1_formatted = f"{var_1:.1f}" # We format to one decimal place
+var_1_formatted = f"{(direct_impact['WageAndSalaryEmployment'] / 1_000_000):.1f}"
+var_2_formatted = f"${(direct_impact['Wages_and_Salary'] / 1_000_000_000):.0f}"
+var_3_formatted = f"${(direct_impact['Value_Added'] / 1_000_000_000):.0f}"
+var_4_formatted = f"{(total_impact['WageAndSalaryEmployment'] / 1_000_000):.1f}"
+var_5_formatted = f"${(total_impact['Wages_and_Salary'] / 1_000_000_000):.0f}"
+var_6_formatted = f"${(total_impact['Value_Added'] / 1_000_000_000):.0f}"
+var_7_formatted = f"${(total_impact['Output'] / 1_000_000_000):.0f}"
 
-# <VAR_2>: Direct Wages_and_Salary in billions
-var_2 = direct_impact['Wages_and_Salary'] / 1_000_000_000
-var_2_formatted = f"${var_2:,.0f}" # We format as a whole number with a dollar sign
-
-# <VAR_3>: Direct Value_Added in billions
-var_3 = direct_impact['Value_Added'] / 1_000_000_000
-var_3_formatted = f"${var_3:,.0f}"
-
-# <VAR_4>: Sum of WageAndSalaryEmployment in millions
-var_4 = total_impact['WageAndSalaryEmployment'] / 1_000_000
-var_4_formatted = f"{var_4:.1f}"
-
-# <VAR_5>: Sum of Wages_and_Salary in billions
-var_5 = total_impact['Wages_and_Salary'] / 1_000_000_000
-var_5_formatted = f"${var_5:,.0f}"
-
-# <VAR_6>: Sum of Value_Added in billions
-var_6 = total_impact['Value_Added'] / 1_000_000_000
-var_6_formatted = f"${var_6:,.0f}"
-
-# <VAR_7>: Sum of Output in billions
-var_7 = total_impact['Output'] / 1_000_000_000
-var_7_formatted = f"${var_7:,.0f}"
-
-# Calculations for the second page (per-worker averages)
 avg_wages_per_worker = (total_impact['Wages_and_Salary'] / total_impact['WageAndSalaryEmployment'])
 avg_wages_per_worker_formatted = f"${avg_wages_per_worker:,.0f}"
-
 avg_gdp_per_worker = (total_impact['Value_Added'] / total_impact['WageAndSalaryEmployment'])
 avg_gdp_per_worker_formatted = f"${avg_gdp_per_worker:,.0f}"
 
 
 # --- Page Navigation ---
-# Streamlit reruns the script on each interaction. We use 'session_state' to remember
-# which page the user is on.
 if 'page' not in st.session_state:
     st.session_state.page = 'main'
 
 def set_page(page_name):
-    """A helper function to change the page in session_state."""
     st.session_state.page = page_name
 
-# --- Main Page Function ---
+# --- Main Page ---
 def main_page():
-    """This function draws the main page of the app."""
     st.title("U.S. Ocean Economy")
-
     try:
-        # Use a simple relative path to the image.
-        # This assumes your 'ENOW state maps' folder is in the root
-        # of your GitHub repository.
-        st.image("ENOW state maps/Map_United_States.jpg", use_container_width=True)
+        st.image("ENOW state maps/Map_United_States.png", use_container_width=True)
     except FileNotFoundError:
-        st.warning("Could not find the map image. Make sure the 'ENOW state maps' folder and its contents are in your GitHub repository.")
-    
-    # The main explanatory text, with our calculated variables inserted.
+        st.warning("Could not find the map image.")
+
     st.markdown(f"""
     <div style="font-size: 22px;">
-    About <b>{var_1_formatted} million</b> Americans are directly employed in the six ocean economy sectors tracked by NOAA. 
-    These workers earned over <b>{var_2_formatted} billion</b> in wages in 2023, and the United States ocean economy 
+    About <b>{var_1_formatted} million</b> Americans are directly employed in the six ocean economy sectors tracked by NOAA.
+    These workers earned over <b>{var_2_formatted} billion</b> in wages in 2023, and the United States ocean economy
     contributed about <b>{var_3_formatted} billion</b> to GDP.
     <br><br>
-    These are big numbers, but they represent only part of ocean industries’ contribution to the broader economy. 
-    Businesses in the ocean economy support additional American jobs by purchasing goods and services from in-state 
-    suppliers (indirect effects). Workers in the ocean economy support additional jobs through local household 
-    spending (induced effects).
+    These are big numbers, but they represent only part of ocean industries’ contribution to the broader economy.
     <br><br>
-    To get a sense of the scale and composition of these economic ripple effects, NOAA’s Office for Coastal Management 
+    To get a sense of the scale and composition of these economic ripple effects, NOAA’s Office for Coastal Management
     used the IMPLAN input-output model to estimate the total economic contribution of our country’s ocean economy.
     </div>
     """, unsafe_allow_html=True)
-
-    # This button, when clicked, will change the page to 'details'
     st.button("View More Data", on_click=set_page, args=('details',))
 
-# --- Details Page Function ---
+
+# --- Details Page ---
+
+def create_pictogram(data_column, icon, scale, color):
+    """Helper function to create and display a pictogram."""
+    st.markdown(f'<p style="color:{color}; font-size: 1.5em; font-weight: bold;">{icon * 20}</p>', unsafe_allow_html=True)
+    for index, row in national_totals_df.iterrows():
+        impact_type = row['ImpactType']
+        value = row[data_column]
+        num_icons = int(value / scale)
+        # Display the icons for each category
+        st.markdown(f"**{impact_type}:** {icon * num_icons}", unsafe_allow_html=True)
+
 def details_page():
-    """This function draws the details page of the app."""
     st.title("Economic Contribution Details")
     st.button("Back to Main Page", on_click=set_page, args=('main',))
 
     # --- Employment Section ---
-    st.markdown("---") # This creates a horizontal line
+    st.markdown("---")
     st.header("Employment")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f"<div style='font-size: 20px;'>Marine industries directly or indirectly supported about <b>{var_4_formatted} million</b> U.S. jobs in 2023.</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 20px;'>Marine industries supported about <b>{var_4_formatted} million</b> U.S. jobs in 2023.</div>", unsafe_allow_html=True)
     with col2:
-        # For the pictograph, we calculate how many icons to show and then print them.
-        num_icons = int(total_impact['WageAndSalaryEmployment'] / 100000)
-        # Using a larger emoji for better visibility
-        st.write("".join(["👨‍💼" for _ in range(num_icons)]))
-        st.caption("Each icon represents 100,000 workers.")
+        st.markdown("Each 👤 represents 100,000 workers.")
+        create_pictogram('WageAndSalaryEmployment', '👤', 100000, '#FFFFFF') # White icon
 
     # --- Wages and Salary Section ---
     st.markdown("---")
@@ -127,16 +121,11 @@ def details_page():
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"""<div style='font-size: 20px;'>
-        Marine industries directly or indirectly supported <b>{var_5_formatted} billion</b> in labor income, 
-        an average of about <b>{avg_wages_per_worker_formatted}</b> per worker.
+        Supported <b>{var_5_formatted} billion</b> in labor income, an average of about <b>{avg_wages_per_worker_formatted}</b> per worker.
         </div>""", unsafe_allow_html=True)
     with col2:
-        fig, ax = plt.subplots()
-        national_totals_df.plot.bar(x='ImpactType', y='Wages_and_Salary', ax=ax, legend=None, color=['#1f77b4', '#ff7f0e', '#2ca02c'])
-        ax.set_xlabel("Impact Type")
-        ax.set_ylabel("Wages and Salary (in Billions USD)")
-        ax.set_title("Wages and Salary by Impact Type")
-        st.pyplot(fig)
+        st.markdown("Each 💰 represents $10 billion.")
+        create_pictogram('Wages_and_Salary', '💰', 10_000_000_000, '#FFD700') # Gold icon
 
     # --- Contribution to GDP Section ---
     st.markdown("---")
@@ -144,34 +133,24 @@ def details_page():
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"""<div style='font-size: 20px;'>
-        Marine industries directly or indirectly supported <b>{var_6_formatted} billion</b> in GDP, 
-        an average of almost <b>{avg_gdp_per_worker_formatted}</b> per worker.
+        Supported <b>{var_6_formatted} billion</b> in GDP, an average of almost <b>{avg_gdp_per_worker_formatted}</b> per worker.
         </div>""", unsafe_allow_html=True)
     with col2:
-        fig, ax = plt.subplots()
-        national_totals_df.plot.bar(x='ImpactType', y='Value_Added', ax=ax, legend=None, color=['#1f77b4', '#ff7f0e', '#2ca02c'])
-        ax.set_xlabel("Impact Type")
-        ax.set_ylabel("Contribution to GDP (in Billions USD)")
-        ax.set_title("Contribution to GDP by Impact Type")
-        st.pyplot(fig)
+        st.markdown("Each 🏭 represents $20 billion.")
+        create_pictogram('Value_Added', '🏭', 20_000_000_000, '#ADD8E6') # Light Blue icon
 
     # --- Economic Output Section ---
     st.markdown("---")
     st.header("Economic Output")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f"<div style='font-size: 20px;'>Marine industries supported about <b>{var_7_formatted} billion</b> in total economic activity around the United States.</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size: 20px;'>Supported about <b>{var_7_formatted} billion</b> in total economic activity.</div>", unsafe_allow_html=True)
     with col2:
-        fig, ax = plt.subplots()
-        national_totals_df.plot.bar(x='ImpactType', y='Output', ax=ax, legend=None, color=['#1f77b4', '#ff7f0e', '#2ca02c'])
-        ax.set_xlabel("Impact Type")
-        ax.set_ylabel("Economic Output (in Billions USD)")
-        ax.set_title("Economic Output by Impact Type")
-        st.pyplot(fig)
+        st.markdown("Each 📈 represents $30 billion.")
+        create_pictogram('Output', '📈', 30_000_000_000, '#90EE90') # Light Green icon
 
 
 # --- App Navigation Logic ---
-# This is the main part of the app that decides which page function to call.
 if st.session_state.page == 'main':
     main_page()
 elif st.session_state.page == 'details':
