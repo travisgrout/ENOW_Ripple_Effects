@@ -117,7 +117,7 @@ def details_page():
     # Treemap is now full-width, placed below the text
     create_treemap(
         data_column='WageAndSalaryEmployment',
-        title='Employment by Impact Type'
+        title=' '
     )
 
     # --- Wages and Salary Section ---
@@ -128,7 +128,7 @@ def details_page():
     </div>""", unsafe_allow_html=True)
     create_treemap(
         data_column='Wages_and_Salary',
-        title='Wages and Salary by Impact Type'
+        title='W '
     )
 
     # --- Contribution to GDP Section ---
@@ -139,7 +139,7 @@ def details_page():
     </div>""", unsafe_allow_html=True)
     create_treemap(
         data_column='Value_Added',
-        title='Contribution to GDP by Impact Type'
+        title=' '
     )
 
     # --- Economic Output Section ---
@@ -148,7 +148,7 @@ def details_page():
     st.markdown(f"<div style='font-size: 20px; text-align: center;'>Supported about <b>{var_7_formatted} billion</b> in total economic activity.</div>", unsafe_allow_html=True)
     create_treemap(
         data_column='Output',
-        title='Economic Output by Impact Type'
+        title=' '
     )
         
 # --- App Navigation Logic ---
