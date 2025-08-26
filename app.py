@@ -129,7 +129,7 @@ def state_page():
             image_path = "https://cdn.star.nesdis.noaa.gov/GOES19/ABI/CONUS/GEOCOLOR/1250x750.jpg"
             st.image(image_path, use_container_width=True, caption="U.S. Coastal View")
         else:
-            map_name = f"Map_{selected_state.replace(' ', '_')}.png"
+            map_name = f"Map_{selected_state.replace(' ', '_')}.jpg"
             image_path = f"ENOW state maps/{map_name}"
             try:
                 st.image(image_path, use_container_width=True)
