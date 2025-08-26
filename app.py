@@ -94,7 +94,7 @@ def create_treemap(data_column, title):
         label=labels, 
         color=colors, 
         ax=ax, 
-        text_kwargs={'color':'black', 'fontsize':40}
+        text_kwargs={'color':'black', 'fontsize':36}
     )
     
     plt.title(title, fontsize=20, color="white")
@@ -128,7 +128,7 @@ def details_page():
     </div>""", unsafe_allow_html=True)
     create_treemap(
         data_column='Wages_and_Salary',
-        title='W '
+        title=' '
     )
 
     # --- Contribution to GDP Section ---
