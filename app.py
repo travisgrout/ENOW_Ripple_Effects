@@ -6,32 +6,6 @@ from pathlib import Path
 # Sets the layout of the page and injects custom CSS for colors.
 st.set_page_config(layout="centered")
 
-def apply_custom_styling():
-    """Applies custom CSS to the Streamlit app."""
-    st.markdown("""
-        <style>
-            /* Targets the main block container */
-            .main .block-container {
-                background-color: #003087;
-            }
-            /* Targets the root of the app */
-            [data-testid="stAppViewContainer"] > .main {
-                background-color: #003087;
-            }
-            /* Targets all text elements */
-            .stApp, .stApp h1, .stApp h2, .stApp h3, .stApp p, .stApp li, .stApp label, .stApp .st-bq, .stApp .st-cx, .stApp .st-dd, .stApp .st-bf, .stApp .st-c5 {
-                color: white;
-            }
-            /* Targets the sidebar */
-            [data-testid="stSidebar"] > div:first-child {
-                background-color: #052359; /* A slightly darker blue for the sidebar */
-            }
-        </style>
-    """, unsafe_allow_html=True)
-
-apply_custom_styling()
-
-
 # --- Data Loading and Processing ---
 try:
     # Using a simple relative path is the most reliable for Streamlit Cloud
