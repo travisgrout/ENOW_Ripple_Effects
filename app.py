@@ -8,11 +8,11 @@ script_dir = Path(__file__).parent
 
 # --- Data Loading and Processing ---
 try:
-    # Construct the full path to the CSV file
-    csv_path = script_dir / "ica_nationalTotals.csv"
-    national_totals_df = pd.read_csv(csv_path)
+    # Use a simple relative path. Streamlit will look for this file
+    # in the root of your GitHub repository.
+    national_totals_df = pd.read_csv("ica_nationalTotals.csv")
 except FileNotFoundError:
-    st.error(f"The file '{csv_path.name}' was not found. Please make sure it is in the same directory as the script.")
+    st.error("The file 'ica_nationalTotals.csv' was not found. Please make sure it is in the root of your GitHub repository.")
     st.stop()
 
 # --- Calculations for Variables ---
@@ -73,16 +73,15 @@ def set_page(page_name):
 def main_page():
     """This function draws the main page of the app."""
     st.title("U.S. Ocean Economy")
-    
-    # Construct the full path to the image file
-    image_path = script_dir / "ENOW state maps" / "Map_United_States.png"
-    
-    try:
-        # st.image needs the path as a string
-        st.image(str(image_path), use_column_width=True)
-    except FileNotFoundError:
-        st.warning(f"Could not find the map image at '{image_path}'")
 
+    try:
+        # Use a simple relative path to the image.
+        # This assumes your 'ENOW state maps' folder is in the root
+        # of your GitHub repository.
+        st.image("ENOW state maps/Map_United_States.png", use_container_width=True)
+    except FileNotFoundError:
+        st.warning("Could not find the map image. Make sure the 'ENOW state maps' folder and its contents are in your GitHub repository.")
+    
     # The main explanatory text, with our calculated variables inserted.
     st.markdown(f"""
     <div style="font-size: 22px;">
