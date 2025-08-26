@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import squarify # <-- IMPORT THE NEW LIBRARY
+import squarify
 
 # --- Page Configuration (using config.toml is recommended) ---
 st.set_page_config(layout="centered")
@@ -61,8 +61,6 @@ def main_page():
     st.button("Learn More", on_click=set_page, args=('details',))
 
 # --- Details Page ---
-
-# (Keep all your code from before this function the same)
 
 def create_treemap(data_column, title):
     """Helper function to create and display a treemap with improved formatting."""
