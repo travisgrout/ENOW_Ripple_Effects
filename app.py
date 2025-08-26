@@ -62,31 +62,48 @@ def main_page():
 
 # --- Details Page ---
 
-def create_treemap(data_column, title, label_format_str):
-    """Helper function to create and display a treemap."""
+# (Keep all your code from before this function the same)
+
+def create_treemap(data_column, title):
+    """Helper function to create and display a treemap with improved formatting."""
     
-    # Extract data and labels
-    sizes = national_totals_df[data_column]
-    labels = [
-        f"{row['ImpactType']}\n{label_format_str.format(row[data_column])}"
-        for _, row in national_totals_df.iterrows()
-    ]
-    
-    # Colors as specified
+    # --- 1. Create Human-Readable Labels ---
+    labels = []
+    for _, row in national_totals_df.iterrows():
+        impact_type = row['ImpactType']
+        value = row[data_column]
+        
+        # Custom formatting based on the data type
+        if data_column == 'WageAndSalaryEmployment':
+            # Format for jobs (e.g., "1,838,885 jobs")
+            formatted_value = f"{value:,.0f} jobs"
+        else:
+            # Format for billions of dollars (e.g., "$91B")
+            formatted_value = f"${value / 1_000_000_000:.0f}B"
+            
+        labels.append(f"{impact_type}\n{formatted_value}")
+
+    sizes = national_totals_df[data_column].values
     colors = ['#056FB7', '#C6E6F0', '#A5AAAF']
     
-    # Create plot
-    fig, ax = plt.subplots(1, figsize=(12, 6))
-    squarify.plot(sizes=sizes, label=labels, color=colors, ax=ax, text_kwargs={'color':'black', 'fontsize':12})
+    # --- 2. Increase Plot and Font Size ---
+    # Increased figsize for a larger plot and fontsize for bigger labels
+    fig, ax = plt.subplots(1, figsize=(16, 9))
+    squarify.plot(
+        sizes=sizes, 
+        label=labels, 
+        color=colors, 
+        ax=ax, 
+        text_kwargs={'color':'black', 'fontsize':16} #<-- Increased font size
+    )
     
-    plt.title(title, fontsize=16, color="white")
+    plt.title(title, fontsize=20, color="white")
     plt.axis('off')
     
-    # Use a transparent background for the plot
+    # Use a transparent background for the plot figure
     fig.patch.set_alpha(0.0)
     
     st.pyplot(fig)
-
 
 def details_page():
     st.title("Economic Contribution Details")
@@ -95,14 +112,13 @@ def details_page():
     # --- Employment Section ---
     st.markdown("---")
     st.header("Employment")
-    col1, col2 = st.columns([1, 2]) # Give more width to the chart column
+    col1, col2 = st.columns([1, 2])
     with col1:
         st.markdown(f"<div style='font-size: 20px;'>Marine industries supported about <b>{var_4_formatted} million</b> U.S. jobs in 2023.</div>", unsafe_allow_html=True)
     with col2:
         create_treemap(
             data_column='WageAndSalaryEmployment',
-            title='Employment by Impact Type',
-            label_format_str="{:,.0f} jobs"
+            title='Employment by Impact Type'
         )
 
     # --- Wages and Salary Section ---
@@ -116,8 +132,7 @@ def details_page():
     with col2:
         create_treemap(
             data_column='Wages_and_Salary',
-            title='Wages and Salary by Impact Type',
-            label_format_str="${:.0f}B"
+            title='Wages and Salary by Impact Type'
         )
 
     # --- Contribution to GDP Section ---
@@ -125,14 +140,13 @@ def details_page():
     st.header("Contribution to GDP")
     col1, col2 = st.columns([1, 2])
     with col1:
-        st.markdown(f"""<div style='font-size: 20px;'>
+        st.markdown(f"""<div style='font--size: 20px;'>
         Supported <b>{var_6_formatted} billion</b> in GDP, an average of almost <b>{avg_gdp_per_worker_formatted}</b> per worker.
         </div>""", unsafe_allow_html=True)
     with col2:
         create_treemap(
             data_column='Value_Added',
-            title='Contribution to GDP by Impact Type',
-            label_format_str="${:.0f}B"
+            title='Contribution to GDP by Impact Type'
         )
 
     # --- Economic Output Section ---
@@ -144,10 +158,9 @@ def details_page():
     with col2:
         create_treemap(
             data_column='Output',
-            title='Economic Output by Impact Type',
-            label_format_str="${:.0f}B"
+            title='Economic Output by Impact Type'
         )
-
+        
 # --- App Navigation Logic ---
 if st.session_state.page == 'main':
     main_page()
