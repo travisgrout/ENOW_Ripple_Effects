@@ -44,7 +44,7 @@ def set_page(page_name):
 def main_page():
     st.title("U.S. Ocean Economy")
     try:
-        st.image("ENOW state maps/Map_United_States.jpg", use_container_width=True)
+        st.image("https://cdn.star.nesdis.noaa.gov/GOES19/ABI/CONUS/GEOCOLOR/1250x750.jpg", use_container_width=True)
     except FileNotFoundError:
         st.warning("Could not find the map image.")
 
