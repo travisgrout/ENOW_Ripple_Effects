@@ -94,7 +94,7 @@ def create_treemap(data_column, title):
         label=labels, 
         color=colors, 
         ax=ax, 
-        text_kwargs={'color':'black', 'fontsize':16} #<-- Increased font size
+        text_kwargs={'color':'black', 'fontsize':40}
     )
     
     plt.title(title, fontsize=20, color="white")
