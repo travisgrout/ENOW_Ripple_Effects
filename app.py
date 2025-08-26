@@ -57,7 +57,8 @@ def main_page():
     used the IMPLAN input-output model to estimate the total economic contribution of our country’s ocean economy.
     </div>
     """, unsafe_allow_html=True)
-    st.button("View More Data", on_click=set_page, args=('details',))
+    st.markdown("---")
+    st.button("Learn More", on_click=set_page, args=('details',))
 
 # --- Details Page ---
 
