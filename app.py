@@ -78,7 +78,7 @@ def main_page():
         # Use a simple relative path to the image.
         # This assumes your 'ENOW state maps' folder is in the root
         # of your GitHub repository.
-        st.image("ENOW state maps/Map_United_States.png", use_container_width=True)
+        st.image("ENOW state maps/Map_United_States.jpg", use_container_width=True)
     except FileNotFoundError:
         st.warning("Could not find the map image. Make sure the 'ENOW state maps' folder and its contents are in your GitHub repository.")
     
