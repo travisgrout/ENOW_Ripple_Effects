@@ -132,13 +132,10 @@ def state_page():
     map_col, chart_col = st.columns(2)
 
     with map_col:
-        # --- THIS IS THE UPDATED LOGIC ---
         if selected_state == "All Coastal States":
-            # If "All Coastal States" is selected, use the URL
             image_path = "https://cdn.star.nesdis.noaa.gov/GOES19/ABI/CONUS/GEOCOLOR/1250x750.jpg"
             st.image(image_path, use_container_width=True, caption="U.S. Coastal View")
         else:
-            # Otherwise, build the local file path for the state map
             map_name = f"Map_{selected_state.replace(' ', '_')}.png"
             image_path = f"ENOW state maps/{map_name}"
             try:
@@ -147,29 +144,37 @@ def state_page():
                 st.warning(f"Map image for '{selected_state}' not found.")
     
     with chart_col:
-        # (The waffle chart code remains exactly the same)
         st.subheader(f"{selected_metric} in {selected_state}")
         
         if national_total == 0:
             st.write("No data to display for the selected criteria.")
             return
+            
+        # --- NEW: Waffle Chart Logic with Fixed Scale ---
+        if selected_metric in ['WageAndSalaryEmployment', 'ProprietorEmployment']:
+            value_per_square = 25000
+            info_text = "25,000 jobs"
+        else: # For Wages_and_Salary, Value_Added, and Output
+            value_per_square = 1_000_000_000
+            info_text = "$1 billion"
+        
+        state_squares = int(round(state_total / value_per_square))
+        other_squares = int(round((national_total - state_total) / value_per_square))
+        
+        # Prevent division by zero if total is zero
+        if (state_squares + other_squares) == 0:
+            st.write("The total value is too small to display on this chart.")
+            return
 
         state_percentage = (state_total / national_total) * 100
+        total_squares = state_squares + other_squares
         
-        if national_total > 1_000_000:
-            scale = math.ceil(national_total / 200)
-        elif national_total == 0:
-            scale = 1
-        else:
-            scale = math.ceil(national_total / 100)
-
-        value_per_square = scale
-        state_squares = int(state_total / value_per_square)
-        other_squares = int((national_total - state_total) / value_per_square)
+        # Dynamically set the number of rows to keep the chart looking good
+        rows = math.ceil(total_squares / 25) if total_squares > 0 else 1
 
         fig = plt.figure(
             FigureClass=Waffle,
-            rows=10,
+            rows=rows,
             values=[state_squares, other_squares],
             colors=("#056FB7", "#A5AAAF"),
             labels=[f"{selected_state} ({state_percentage:.1f}%)", "Rest of U.S."],
@@ -177,13 +182,14 @@ def state_page():
             font_size=20,
             icons='square',
             icon_style='solid',
+            # Let pywaffle handle the layout automatically
         )
         fig.patch.set_alpha(0.0)
         ax = plt.gca()
         ax.set_facecolor('#00000000')
         ax.legend(facecolor='#DDDDDD')
         st.pyplot(fig)
-        st.info(f"Each square represents approximately **{value_per_square:,.0f}** units of '{selected_metric}'.")
+        st.info(f"Each square represents **{info_text}** of '{selected_metric}'.")
         
 # --- Main App Router ---
 
