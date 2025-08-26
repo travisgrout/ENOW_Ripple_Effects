@@ -119,24 +119,17 @@ def state_page():
         st.warning("Please select at least one effect type.")
         return
 
-    filtered_by_impact = state_totals_df[state_totals_df['ImpactType'].isin(selected_impacts)]
-    national_total = filtered_by_impact[selected_metric].sum()
-
-    if selected_state == "All Coastal States":
-        state_total = national_total
-    else:
-        state_total = filtered_by_impact[filtered_by_impact['DestinationState'] == selected_state][selected_metric].sum()
-
     # --- 3. Display Map and Waffle Chart ---
     st.markdown("---")
     map_col, chart_col = st.columns(2)
 
     with map_col:
+        # Map display logic (unchanged)
         if selected_state == "All Coastal States":
             image_path = "https://cdn.star.nesdis.noaa.gov/GOES19/ABI/CONUS/GEOCOLOR/1250x750.jpg"
             st.image(image_path, use_container_width=True, caption="U.S. Coastal View")
         else:
-            map_name = f"Map_{selected_state.replace(' ', '_')}.jpg"
+            map_name = f"Map_{selected_state.replace(' ', '_')}.png"
             image_path = f"ENOW state maps/{map_name}"
             try:
                 st.image(image_path, use_container_width=True)
@@ -146,43 +139,61 @@ def state_page():
     with chart_col:
         st.subheader(f"{selected_metric} in {selected_state}")
         
-        if national_total == 0:
-            st.write("No data to display for the selected criteria.")
-            return
-            
-        # --- NEW: Waffle Chart Logic with Fixed Scale ---
+        # --- NEW: Waffle Chart Data Breakdown ---
+        impact_order = ['Direct', 'Indirect', 'Induced']
+        
+        # Filter data based on user's checkbox selections
+        filtered_df = state_totals_df[state_totals_df['ImpactType'].isin(selected_impacts)]
+
+        # Calculate national totals for each impact type
+        national_breakdown = filtered_df.groupby('ImpactType')[selected_metric].sum().reindex(impact_order, fill_value=0)
+
+        # Calculate state totals for each impact type
+        if selected_state == "All Coastal States":
+            state_breakdown = national_breakdown
+        else:
+            state_data = filtered_df[filtered_df['DestinationState'] == selected_state]
+            state_breakdown = state_data.groupby('ImpactType')[selected_metric].sum().reindex(impact_order, fill_value=0)
+        
+        # Calculate the non-state remainder for each impact type
+        non_state_breakdown = national_breakdown - state_breakdown
+
+        # Define fixed scale per user request
         if selected_metric in ['WageAndSalaryEmployment', 'ProprietorEmployment']:
             value_per_square = 25000
             info_text = "25,000 jobs"
-        else: # For Wages_and_Salary, Value_Added, and Output
+        else:
             value_per_square = 1_000_000_000
             info_text = "$1 billion"
-        
-        state_squares = int(round(state_total / value_per_square))
-        other_squares = int(round((national_total - state_total) / value_per_square))
-        
-        # Prevent division by zero if total is zero
-        if (state_squares + other_squares) == 0:
-            st.write("The total value is too small to display on this chart.")
-            return
 
-        state_percentage = (state_total / national_total) * 100
-        total_squares = state_squares + other_squares
+        # Calculate squares for each of the 6 categories
+        values_by_cat = {
+            'State Direct': int(round(state_breakdown.get('Direct', 0) / value_per_square)),
+            'State Indirect': int(round(state_breakdown.get('Indirect', 0) / value_per_square)),
+            'State Induced': int(round(state_breakdown.get('Induced', 0) / value_per_square)),
+            'Non-State Direct': int(round(non_state_breakdown.get('Direct', 0) / value_per_square)),
+            'Non-State Indirect': int(round(non_state_breakdown.get('Indirect', 0) / value_per_square)),
+            'Non-State Induced': int(round(non_state_breakdown.get('Induced', 0) / value_per_square)),
+        }
+
+        # Define colors and labels, ensuring the order matches the dictionary
+        colors = ["#056FB7", "#5499C7", "#A9CCE3", "#616A6B", "#A5AAAF", "#E5E7E9"]
+        labels = [f"{k} ({v} sq.)" for k, v in values_by_cat.items()]
         
-        # Dynamically set the number of rows to keep the chart looking good
-        rows = math.ceil(total_squares / 25) if total_squares > 0 else 1
+        if sum(values_by_cat.values()) == 0:
+            st.write("No data to display for the selected criteria.")
+            return
 
         fig = plt.figure(
             FigureClass=Waffle,
-            rows=rows,
-            values=[state_squares, other_squares],
-            colors=("#056FB7", "#A5AAAF"),
-            labels=[f"{selected_state} ({state_percentage:.1f}%)", "Rest of U.S."],
+            columns=25, # Fixed width, height will adjust
+            values=list(values_by_cat.values()),
+            colors=colors,
+            labels=labels,
             legend={'loc': 'upper left', 'bbox_to_anchor': (1, 1), 'fontsize': 12},
             font_size=20,
             icons='square',
             icon_style='solid',
-            # Let pywaffle handle the layout automatically
         )
         fig.patch.set_alpha(0.0)
         ax = plt.gca()
